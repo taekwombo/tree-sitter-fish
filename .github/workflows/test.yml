@@ -25,5 +25,5 @@ jobs:
           - name: Run parser tests
             run: npm run test
           - name: Run parser against examples
-            run: echo "::notice file=./scripts/test_shared.sh,line=1::$(npm run test:examples | sed 's/\n/%0A/g'"
+            run: echo "::notice file=./scripts/test_shared.sh,line=1::$(npm run test:examples | sed 's/\n/%0A/g')"
 
