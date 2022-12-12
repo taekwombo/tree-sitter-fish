@@ -251,7 +251,7 @@ module.exports = grammar({
         double_quote_string: $ => seq(
             '"',
             repeat(choice(
-                token.immediate(/[^\$\\"]+/),
+                /[^\$\\"]+/,
                 $.variable_expansion,
                 $.escape_sequence,
                 /*
@@ -266,7 +266,7 @@ module.exports = grammar({
         single_quote_string: $ => seq(
             '\'',
             repeat(choice(
-                token.immediate(/[^'\\]+/),
+                /[^'\\]+/,
                 $.escape_sequence,
             )),
             '\'',
@@ -290,8 +290,8 @@ module.exports = grammar({
             )),
         )),
 
-        stream_redirect: () => token(/\d*(>>|>|<)&[012-]/),
-        direction: () => token(/(\d*|&)(>>?\??|<)/),
+        stream_redirect: () => /\d*(>>|>|<)&[012-]/,
+        direction: () => /(\d*|&)(>>?\??|<)/,
 
         file_redirect: $ => seq(
             field('operator', $.direction),
