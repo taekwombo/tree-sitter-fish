@@ -66,15 +66,4 @@ echo 1 \
   (command
     (word)
     (integer)
-    (concatenation
-      (escape_sequence))
-    (word)
-    (word)
-    (word)
-    (word)
-    (word)
-    (word)
-    (word)
-    (word)
-    (word)
-    (word)))
+    (comment)))
