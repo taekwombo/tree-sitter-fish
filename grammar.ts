@@ -1,26 +1,72 @@
 // TODO(9):     Go through SPECIAL_CARACTERS for `word` and `bracket_word` and ensure they are correct.
 
-function charMatch(characterArray: string[], negate: boolean): RegExp {
+type Options = {
+    negate?: boolean;
+    quantifier?: string;
+}
+
+function charsToPattern(characterArray: string[]) {
     const regexSpecialCharacters = [
-        '$', '\\', '*', '~', '#', '(', ')', '{', '}', '|', '^', '&',
+        '$', '\\', '*', '(', ')', '{', '}', '|', '^', '[', ']',
     ];
 
-    const escaped = characterArray.map((c) =>
+    return characterArray.map((c) =>
         regexSpecialCharacters.includes(c) ? '\\' + c : c);
+}
 
-    return new RegExp(`[${negate ? '^' : ''}${escaped.join('')}]+`);
+function charMatch(characterArray: string[], { negate = false, quantifier = '' }: Options): RegExp {
+    const escaped = charsToPattern(characterArray);
+    return new RegExp(`[${negate ? '^' : ''}${escaped.join('')}]${quantifier}`);
 }
 
 function noneOf(characterArray: string[]): RegExp {
-    return charMatch(characterArray, true);
+    return charMatch(characterArray, { negate: true, quantifier: '+' });
 }
+
+const charStart = charsToPattern([
+    // Characters that cannot start a word.
+    '$',
+    '*',
+    '~',
+    '(', ')',
+    '{', '}',
+    '\\[', '\\]',
+    '<', '>',
+    '"', "'",
+    '^',
+    '#',
+    '&',
+    '|',
+    ';',
+    '\\',
+    '\\s',
+]);
+
+const charContinue = charsToPattern([
+    // Characters that cannot continue a word.
+    '$',
+    '*',
+    '~',
+    '(', ')',
+    '{', '}',
+    '\\[', '\\]',
+    '<', '>',
+    '"', "'",
+    '^',
+    '&',
+    '|',
+    ';',
+    '\\',
+    '\\s',
+]);
+
+const wordPattern = new RegExp(`[^${charStart.join('')}][^${charContinue.join('')}]*`);
 
 module.exports = grammar({
     name: 'fish',
 
     externals: $ => [
         $._concat,
-        $._concat_oct,
         $._brace_concat,
         $._concat_list,
     ],
@@ -303,12 +349,9 @@ module.exports = grammar({
         concatenation: $ => seq(
             choice($._base_expression, $._special_character),
             repeat1(
-                choice(
-                    $._concat_oct,
-                    seq(
-                        $._concat,
-                        choice($._base_expression, $._special_character),
-                    ),
+                seq(
+                    $._concat,
+                    choice($._base_expression, $._special_character, '#'),
                 ),
             ),
         ),
@@ -363,23 +406,7 @@ module.exports = grammar({
 
         glob: () => token(repeat1('*')),
 
-        word: () => noneOf([
-            '$',
-            '*',
-            '~',
-            '#',
-            '(', ')',
-            '{', '}',
-            '\\[', '\\]',
-            '<', '>',
-            '"', "'",
-            '^',
-            '&',
-            '|',
-            ';',
-            '\\',
-            '\\s',
-]),
+        word: () => wordPattern,
 
         brace_word: () => noneOf(['$', '\'', '*', '"', ',', '\\', '{', '}', '(', ')']),
     },
