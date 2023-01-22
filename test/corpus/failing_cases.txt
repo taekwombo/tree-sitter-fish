@@ -38,3 +38,43 @@ set (
       (command
         (word)
         (word)))))
+
+================================================================================
+Incorrect concatenation with #
+================================================================================
+
+echo 1\
+# no space before backslash - concat here
+echo 1 \
+# space before backslash - comment here but parses as concat
+
+--------------------------------------------------------------------------------
+
+(program
+  (command
+    (word)
+    (concatenation
+      (integer)
+      (escape_sequence))
+    (word)
+    (word)
+    (word)
+    (word)
+    (word)
+    (word)
+    (word))
+  (command
+    (word)
+    (integer)
+    (concatenation
+      (escape_sequence))
+    (word)
+    (word)
+    (word)
+    (word)
+    (word)
+    (word)
+    (word)
+    (word)
+    (word)
+    (word)))
